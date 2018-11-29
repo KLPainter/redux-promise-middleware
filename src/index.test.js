@@ -7,40 +7,39 @@ describe ('middleware tests', () => {
 
     const reducer = jest.fn();
     const next = jest.fn();
-    const action = { type: 'SUCCESSFUL PROMISE', payload: Promise.resolve('Howdy') };
+    const action = { type: 'SUCCESSFUL_PROMISE', payload: Promise.resolve('Howdy') };
     const store = createStore(reducer, applyMiddleware(middleware));
 
     middleware(store)(next)(action);
 
     return action.payload
       .then(() => {
-        console.log('running tests');
-        expect(next.mock.calls).toHaveLength(1);
-        expect(store.dispatch.calls).toHaveLength(2);
-        // expect(action.mock.calls[0][0]).toBe(store.dispatch);
-        // expect(action.mock.calls[0][1]).toBe(store.getState);
+        expect(next.mock.calls[0][0]).toEqual({ type: 'SUCCESSFUL_PROMISE', payload: 'Howdy' });
+        expect(reducer.mock.calls[1][1]).toEqual({ type: 'LOAD_START' });
+        expect(reducer.mock.calls[2][1]).toEqual({ type: 'LOAD_END' });
       });
+  });
 
-    console.log('too soon to run tests!');
+  it('responds to a rejected promise', () => {
 
+    const reducer = jest.fn();
+    const next = jest.fn();
+    const action = { type: 'REJECTED_PROMISE', payload: Promise.reject('No way!') };
+    const store = createStore(reducer, applyMiddleware(middleware));
+
+    middleware(store)(next)(action);
+
+    return action.payload
+      .then(() => {
+      })
+      .catch(() => {
+        expect(reducer.mock.calls[1][1]).toEqual({ type: 'LOAD_START' });
+        expect(reducer.mock.calls[2][1]).toEqual({ type: 'LOAD_END' });
+        expect(reducer.mock.calls[3][1]).toEqual({ type: 'ERROR', payload: 'No way!' });
+      });
   });
 
 });
-
-/*
-Create an src/index.test.js file and put your tests inside.
-
-test your middleware
-create a mock reducer with const reducer = jest.fn()
-create a store using the mock reducer const store = createStore(reducer, applyMiddleware(promiseMiddleware))
-Test successful promise (use Promise.resolve as payload)
-LOAD_START action is sent
-LOAD_END action is sent
-PROMISE_ACTION action is sent
-Test unsuccessful promise (use Promise.reject as payload)
-LOAD_END action is sent
-ERROR action is sent
- */
 
 describe ('isPromise tests', () => {
 

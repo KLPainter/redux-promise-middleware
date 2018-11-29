@@ -15,7 +15,7 @@ export const middleware = store => next => action => {
   }
 
   console.log('dispatching load_start before promise');
-  store.dispatch({ type: 'LOAD_START' });
+  store.dispatch ({ type: 'LOAD_START' });
   action.payload
     .then(results => {
       console.log('results of promise:', results);
@@ -29,10 +29,11 @@ export const middleware = store => next => action => {
     .catch(error => {
       console.log('dispatching load_end in error');
       store.dispatch({ type: 'LOAD_END' });
-      store.dispatch({
+      return store.dispatch({
         type: 'ERROR',
         payload: error
       });
+      //throw error;
     });
 
 
