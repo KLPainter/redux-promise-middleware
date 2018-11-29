@@ -1,33 +1,25 @@
 export function isPromise(possiblePromise) {
-  if(typeof possiblePromise === 'object') {
-    if(typeof possiblePromise.then === 'function') {
-      return true;
-    }
-  }
-  return false;
+  return typeof possiblePromise === 'object' && typeof possiblePromise.then === 'function';
 }
 
 export const middleware = store => next => action => {
 
-  if(!isPromise(action.payload)) {
+  const { type, payload } = action;
+  const { dispatch } = store;
+
+  if(!isPromise(payload)) {
     return next(action);
   }
 
-  store.dispatch ({ type: 'LOAD_START' });
-  action.payload
+  dispatch ({ type: 'LOAD_START' });
+  return action.payload
     .then(results => {
-      next({
-        type: action.type,
-        payload: results
-      });
-      store.dispatch({ type: 'LOAD_END' });
+      next({ type: type, payload: results });
+      dispatch({ type: 'LOAD_END' });
     })
     .catch(error => {
-      store.dispatch({ type: 'LOAD_END' });
-      store.dispatch({
-        type: 'ERROR',
-        payload: error
+      dispatch({ type: 'LOAD_END' });
+      dispatch({ type: 'ERROR', payload: error
       });
-      throw error;
     });
 };
