@@ -1,4 +1,4 @@
-import redux, { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { middleware, isPromise } from './index';
 
 describe ('middleware tests', () => {
@@ -46,6 +46,7 @@ describe ('isPromise tests', () => {
   it('returns true when sent a promise', () => {
     const myPromise = new Promise(function(resolve, reject) {
       resolve('Yep!');
+      reject('Nope!');
     });
     expect(isPromise(myPromise)).toBeTruthy;
   });
