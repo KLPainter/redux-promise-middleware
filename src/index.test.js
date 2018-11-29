@@ -30,8 +30,7 @@ describe ('middleware tests', () => {
     middleware(store)(next)(action);
 
     return action.payload
-      .then(() => {
-      })
+      .then()
       .catch(() => {
         expect(reducer.mock.calls[1][1]).toEqual({ type: 'LOAD_START' });
         expect(reducer.mock.calls[2][1]).toEqual({ type: 'LOAD_END' });
